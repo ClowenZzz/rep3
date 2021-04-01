@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="zh_CN" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{common1::header('模板页面')}">
+</head>
+<body>
+<script type="text/javascript" th:inline="none">
+    $(function () {
+        $("#dddDg").datagrid({
+            url:'/showEmps',
+            columns:[[
+                {field:'empno',title:'编号',width:100,hidden:true},
+                {field:'ename',title:'姓名',width:100},
+                {field:'job',title:'岗位',width:100,align:'right'},
+                {field:'mgr',title:'上级领导',width:100,align:'right'},
+                {field:'hiredate',title:'入职日期',width:100,align:'right'},
+                {field:'sal',title:'工资',width:100,align:'right'},
+                {field:'comm',title:'奖金',width:100,align:'right'},
+                {field:'dept',title:'dept',width:100,formatter:
+                        function(value,row,index){
+                            if (row.dept){
+                                return row.dept.dname;
+                            } else {
+                                return value;
+                            }
+                        }
+                }
+            ]]
+        });
+    })
+</script>
+<table id="dddDg"></table>
+
+</body>
+</html>

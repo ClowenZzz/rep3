@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="zh_CN" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{common1::header('EasyUI2')}">
+</head>
+<script >
+    $.extend($.fn.validatebox.defaults.rules, {
+        minLength: {
+            validator: function(value, param){
+                return value.length >= param[0];
+            },
+            message: '密码最少要有{0}位'
+        }
+    });
+</script>
+<body>
+<!--<div id="p" class="easyui-panel" style="width:500px;height:200px;padding:10px;"-->
+     <!--title="My Panel" iconCls="icon-save" collapsible="true">-->
+    <!--The panel content-->
+<!--</div>-->
+
+
+<div style="margin: 200px auto;width:500px;">
+    <div id="p" class="easyui-panel" title="登录"
+         style="width:500px;height:180px;padding:10px;background:#fafafa;"
+         data-options="iconCls:'icon-my',closable:true,
+                    collapsible:true,minimizable:true,maximizable:true">
+        <form id="loginForm" method="post">
+            <table align="center">
+                <tr>
+                    <td colspan="2" style="text-align: center;font-size: 20px;font-weight: bold">员工管理系统</td>
+                </tr>
+                <tr>
+                    <td>用户名：</td>
+                    <td> <input class="easyui-validatebox" type="text" name="name" data-options="required:true,missingMessage:'请输入用户名'" /></td>
+                </tr>
+                <tr>
+                    <td>密码：</td>
+                    <td><input class="easyui-validatebox" type="password" name="password"  data-options="required:true,validType:'minLength[3]'" /></td>
+                </tr>
+                <tr>
+                    <td colspan="2" align="center">
+                        <a style="margin-top: 5px" id="submitBtn" href="#" class="easyui-linkbutton" data-options="iconCls:'icon-ok'">登录</a>
+                    </td>
+                </tr>
+            </table>
+        </form>
+    </div>
+</div>
+<script type="text/javascript">
+    $('#submitBtn').click(function () {
+
+        $('#loginForm').form('submit', {
+            url:"/user/login",
+            onSubmit: function(){
+                // do some check
+                // return false to prevent submit;
+            },
+            success:function(result){
+                if (result=="error") {
+                    alert("shibai")
+                }else {
+                    $.messager.alert('登录','登录成功');
+                    //$("#p").dialog("close");//删除了元素
+                    // location.href ="/emp/list";
+                }
+            }
+        });
+    })
+
+</script>
+
+
+
+</body>
+</html>

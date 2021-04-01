@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="zh_CN" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{common1::header('Layout布局')}">
+</head>
+<body>
+<div id="aa" class="easyui-accordion" style="width:500px;height:300px;"  data-options="fit:true">
+    <div title="Title1" data-options="iconCls:'icon-save'" style="overflow:auto;padding:10px;">
+        <h3 style="color:#0099FF;">Accordion for jQuery</h3>
+        <p>Accordion is a part of easyui framework for jQuery.
+            It lets you define your accordion component on web page more easily.</p>
+    </div>
+    <div title="Title2" data-options="iconCls:'icon-reload',selected:true" style="padding:10px;">
+        <ul class="easyui-tree" data-options="url:'showMenu/',method:'get',animate:true,lines:true"></ul>
+        <!--<ul id="tree"></ul>-->
+        <!--<script>-->
+            <!--$("#tree").tree({-->
+                <!--url:'showMenu/',-->
+                <!--method:'get',-->
+                <!--animate:true,-->
+                <!--lines:true-->
+
+            <!--})-->
+
+        <!--</script>-->
+    </div>
+
+</div>
+
+</body>
+</html>

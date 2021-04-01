@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="zh_CN" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{common1::header('信息展示')}"></head>
+<body>
+<div id="tb" style="padding:5px;height:auto">
+    <div id="tool" style="margin-bottom:5px">
+        <a id="add"  href="#" style="float: left;" text="添加" class="easyui-linkbutton"
+           iconCls="icon-add" plain="true"></a>
+        <div class="datagrid-btn-separator"></div>
+        <a id="upd"  href="#" style="float: left;" text="修改" class="easyui-linkbutton"
+           iconCls="icon-edit" plain="true"></a>
+        <div class="datagrid-btn-separator"></div>
+        <a id="del"  href="#" style="float: left;" text="删除" class="easyui-linkbutton"
+           iconCls="icon-remove" plain="true"></a>
+    </div>
+    <hr>
+    <div>
+        入职日期 从: <input id="date1"   class="easyui-datebox" style="width:80px">
+        到: <input id="date2" class="easyui-datebox" style="width:80px">
+        姓名：
+        <input id="ename" class="easyui-textbox" style="width:100px"
+               valueField="ename" textField="text">
+        部门:
+        <input  id="deptno2"  class="easyui-combobox"
+                 name="deptno"
+                style="width:100px"
+                 data-options
+                        .="valueField:'deptno', //value为员工编号
+            textField:'dname', //文本为员工姓名
+            url:'emp/depts', //请求json数据的地址
+
+            editable:false" >
+        <a id="search" href="#"  onclick="searchB()" class="easyui-linkbutton" iconCls="icon-search">Search</a>
+
+    </div>
+    <script type="text/javascript" th:inline="none">
+
+        function searchB(){
+            $("#dg").datagrid("load",{
+                date1:$("#date1").val(),
+                date2:$("#date2").val(),
+                ename:$("#ename").val(),
+                deptno:$("#deptno2").val(),
+            })
+        }
+
+
+
+    </script>
+</div>
+<table id="dg"></table>
+
+<div id="dlg" class="easyui-dialog"
+     style="width:400px;height:600px;padding:10px 20px"
+     closed="true" buttons="#dlg-buttons">
+    <div class="ftitle">添加员工</div>
+
+    <form id="fm" method="post">
+        <div style="margin-bottom:20px;display: none;">
+            <input class="easyui-textbox" name="empno" style="width:100%"
+                   data-options="label:'编号:'">
+        </div>
+        <div style="margin-bottom:20px">
+            <input class="easyui-textbox" name="ename" style="width:100%"
+                   data-options="label:'姓名:',required:true">
+        </div>
+        <div style="margin-bottom:20px">
+            <input class="easyui-textbox" name="job" style="width:100%" data-options="label:'岗位:',required:true">
+        </div>
+        <div style="margin-bottom:20px">
+            <input class="easyui-textbox" name="mgr" style="width:100%" data-options="label:'上级领导:',required:true">
+        </div>
+        <div style="margin-bottom:20px">
+            <input class="easyui-datebox" name="hiredate" style="width:100%"
+                   data-options="label:'入职日期:',required:true">
+        </div>
+        <div style="margin-bottom:20px">
+            <input class="easyui-textbox" name="sal" style="width:100%" data-options="label:'工资:',required:true">
+        </div>
+        <div style="margin-bottom:20px">
+            <input class="easyui-textbox" name="comm" style="width:100%"
+                   data-options="label:'奖金:',required:true">
+        </div>
+        <div style="margin-bottom:20px">
+            <input  class="easyui-combobox"
+             name="deptno"
+             style="width:100%"
+             data-options="valueField:'deptno', //value为员工编号
+            textField:'dname', //文本为员工姓名
+            url:'emp/depts', //请求json数据的地址
+            label:'部门:', //标签名
+            required:true, //非空验证
+            editable:false" >
+        </div>
+    </form>
+</div>
+<div id="dlg-buttons">
+    <a href="#" class="easyui-linkbutton" iconCls="icon-ok"
+       onclick="saveOrUpdateUser()">Save</a>
+    <a href="#" class="easyui-linkbutton" iconCls="icon-cancel"
+       onclick="javascript:$('#dlg').dialog('close')">Cancel</a>
+</div>
+<script type="text/javascript" th:inline="none">
+    var url;
+
+    $("#add").click(function () {
+        $('#dlg').dialog('open').dialog('setTitle','添加员工');
+        $('#fm').form('clear');
+        url = 'emp/insertE';
+
+    })
+
+
+
+    $("#upd").click(function () {
+        var row = $('#dg').datagrid('getSelected');
+        //判断是否选中一行
+        if (row){
+            //打开对话框
+            $('#dlg').dialog('open').dialog('setTitle','编辑员工');
+            //往表单中加载选中的行对象
+            $('#fm').form('load',row);
+            //设置修改的后台地址
+            url = 'emp/update';
+        }else{
+            $.messager.alert('警告','请选择你要修改的行!','warning');
+        }
+    });
+
+    $("#del").click(function () {
+        if($("#dg").datagrid("getSelections").length > 0){
+            //var row = $("#dg").datagrid("getSelected");
+            var row=$("#dg").datagrid("getSelections");
+            var ids='';
+            for (var i=0;i<row.length;i++) {
+                ids+=row[i].empno;
+                //只要不是最后一个，就加逗号
+                if(i<row.length-1){
+                    ids+= ',';
+                }
+            }
+            url = "emp/deletes?ids="+ids;
+            $.messager.confirm('删除确认', '您确定要删除这行吗?',
+                function(r){
+                    if (r){
+                        //发生ajax请求
+                        $.ajax({
+                            url:url,
+                            type:"POST",
+                            success:function (json) {
+                                if(json != "error"){
+                                    //刷新数据
+                                    $("#dg").datagrid("reload");
+                                    $.messager.show({
+                                        title:'系统消息',
+                                        msg:json,
+                                        timeout:3000,
+                                        showType:'slide'
+                                    });
+                                }
+                            },
+                            error:function () {
+                                $.messager.show({
+                                    title:'系统消息',
+                                    msg:'删除失败',
+                                    timeout:3000,
+                                    showType:'slide'
+                                });
+                            }
+                        });
+                    }
+                });
+        }else{
+            $.messager.alert("系统信息","至少选择一行");
+        }
+    });
+
+
+
+
+    $("#dg").datagrid({
+        selectOnCheck:true,
+        url:'emp/page',//请求路径
+        method:'get',//请求方式
+        pagination:true,//分页
+        rownumbers:true,//显示行号
+        pageList:[5,10,15,20,30],//每页显示的数字
+        fit:true,//按父容器大小填充
+        striped:true,//显示斑马线效果
+
+        // toolbar: [
+        //     {//工具栏
+        //     text:'添加',
+        //     iconCls: 'icon-add',
+        //     handler: function(){//要做的事情
+        //         $('#dlg').dialog('open').dialog('setTitle','添加员工');
+        //         $('#fm').form('clear');
+        //         url = 'emp/insertE';
+        //     }
+        // },'-',{
+        //     text:'修改',
+        //     iconCls: 'icon-edit',
+        //     handler: function(){
+        //         var row = $('#dg').datagrid('getSelected');
+        //         //判断是否选中一行
+        //         if (row){
+        //             //打开对话框
+        //             $('#dlg').dialog('open').dialog('setTitle','编辑员工');
+        //             //往表单中加载选中的行对象
+        //             $('#fm').form('load',row);
+        //             //设置修改的后台地址
+        //             url = 'emp/update';
+        //         }else{
+        //             $.messager.alert('警告','请选择你要修改的行!','warning');
+        //         }
+        //     }
+        // },'-',{
+        //     text:'删除',
+        //     iconCls: 'icon-cancel',
+        //     handler: function(){
+        //         //获取选中的行
+        //         if($("#dg").datagrid("getSelections").length > 0){
+        //             //var row = $("#dg").datagrid("getSelected");
+        //             var row=$("#dg").datagrid("getSelections");
+        //             var ids='';
+        //             for (var i=0;i<row.length;i++) {
+        //              ids+=row[i].empno;
+        //                 //只要不是最后一个，就加逗号
+        //                 if(i<row.length-1){
+        //                     ids+= ',';
+        //                 }
+        //             }
+        //             url = "emp/deletes?ids="+ids;
+        //             $.messager.confirm('删除确认', '您确定要删除这行吗?',
+        //                 function(r){
+        //                     if (r){
+        //                         //发生ajax请求
+        //                         $.ajax({
+        //                             url:url,
+        //                             type:"POST",
+        //                             success:function (json) {
+        //                                 if(json != "error"){
+        //                                     //刷新数据
+        //                                     $("#dg").datagrid("reload");
+        //                                     $.messager.show({
+        //                                         title:'系统消息',
+        //                                         msg:json,
+        //                                         timeout:3000,
+        //                                         showType:'slide'
+        //                                     });
+        //                                 }
+        //                             },
+        //                             error:function () {
+        //                                 $.messager.show({
+        //                                     title:'系统消息',
+        //                                     msg:'删除失败',
+        //                                     timeout:3000,
+        //                                     showType:'slide'
+        //                                 });
+        //                             }
+        //                         });
+        //                     }
+        //                 });
+        //         }else{
+        //             $.messager.alert("系统信息","至少选择一行");
+        //         }
+        //     }
+        // }],
+           toolbar:"#tb",
+        columns:[
+            [
+                {field:'ck',checkbox:true},
+                {field:'empno',title:'empno',width:100,hidden:true},
+                {field:'ename',title:'ename',width:100},
+                {field:'job',title:'job',width:100},
+                {field:'mgr',title:'mgr',width:100},
+                {field:'hiredate',title:'hiredate',width:100},
+                {field:'sal',title:'sal',width:100,sortable:true},
+                {field:'comm',title:'comm',width:100},
+                {field:'dept',title:'dept',width:100,formatter:
+                        function(value,row,index){
+                            if (row.dept){
+                                return row.dept.dname;
+                            } else {
+                                return value;
+                            }
+                        }
+                }
+            ]
+        ]
+    });
+    //保存
+    function saveOrUpdateUser(){
+        $('#fm').form('submit',{
+
+            url: url,
+            method:"post",
+            onSubmit: function(){
+                return $(this).form('validate');
+            },
+            success: function(result){
+                if(result == "success"){
+                    //保存成功,提示信息
+                    $.messager.show({
+                        title: '提示',
+                        msg: "更新成功",
+                        timeout:2000,
+                        showType:'show'
+                    });
+                    //关闭对话框
+                    $('#dlg').dialog('close');
+                    //刷新数据表格
+                    $('#dg').datagrid('reload');
+                }else{
+                    //保存失败
+                    $.messager.show({
+                        title: '提示',
+                        msg: "更新失败",
+                        timeout:2000,
+                        showType:'show'
+                    });
+                }
+            }
+        });
+    }
+</script>
+
+</body>
+</html>
